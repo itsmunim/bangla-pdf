@@ -4,7 +4,7 @@ const fs = require('fs');
 function createBanglaPdf(content) {
   let doc = new PDFDocument();
   doc.pipe(fs.createWriteStream('output.pdf'));
-  doc.font('fonts/bangla1.ttf').fontSize(14);
+  doc.font('fonts/kalpurush.ttf').fontSize(14);
   doc.text(content, 100, 100);
   doc.end();
 }

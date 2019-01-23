@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<div id="content">
+    <p>
+        একটি বাংলাদেশ তুমি জাগ্রত জনতার,
+        সারা বিশ্বের বিস্ময় তুমি আমার অহংকার।
+
+        এক সাগর রক্তের বিনিময়ে বাংলার স্বাধীনতা আনলে যারা,
+        আমরা তোমাদের ভুলব না!
+    </p>
+</div>
+<a href="#" id="downloadBtn">Download as PDF</a>
+<script src="static/js/pdfkit.js"></script>
+<script src="static/js/blob-stream.js"></script>
+<script src="node_modules/axios/dist/axios.js"></script>
+<script>
+  function loadFont(url) {
+    return axios({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer'
+    }).then(response => response.data);
+  }
+
+  function generatePDF() {
+    loadFont('fonts/kalpurush.ttf')
+      .then((fontData) => {
+        const doc = new PDFDocument();
+        const stream = doc.pipe(blobStream());
+        doc.registerFont('bangla', fontData);
+        doc.font('bangla').fontSize(14);
+        doc.text(document.getElementById('content').textContent, 100, 100);
+        doc.end();
+        stream.on('finish', function() {
+          const blob = stream.toBlob('application/pdf');
+          let button = document.getElementById('downloadBtn');
+          button.href = window.URL.createObjectURL(blob);
+          button.target = '_blank';
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  generatePDF();
+</script>
+</body>
+
+</html>
