@@ -5,3 +5,6 @@ Simplest example on how to create bangla pdf using custom bangla fonts. This exa
 #### Run
 - `npm install`
 - `npm start` - this will generate an `output.pdf` with the content given in `index.js`
+
+#### In Browser
+- Open `index.html`
