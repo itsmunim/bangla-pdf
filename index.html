@@ -5,7 +5,7 @@
 </head>
 
 <body>
-<div id="content">
+<div id="content" style="width: 500px; height: 300px">
     <p>
         একটি বাংলাদেশ তুমি জাগ্রত জনতার,
         সারা বিশ্বের বিস্ময় তুমি আমার অহংকার।
@@ -14,10 +14,16 @@
         আমরা তোমাদের ভুলব না!
     </p>
 </div>
-<a href="#" id="downloadBtn">Download as PDF</a>
+<div>
+    <a href="#" id="downloadBtn">Download as PDF(Generated with Custom Font)</a>
+</div>
+<div>
+    <a href="#" id="downloadBtn2">Download as PDF(Generated with Image from HTML)</a>
+</div>
 <script src="static/js/pdfkit.js"></script>
 <script src="static/js/blob-stream.js"></script>
 <script src="node_modules/axios/dist/axios.js"></script>
+<script src="node_modules/dom-to-image/dist/dom-to-image.min.js"></script>
 <script>
   function loadFont(url) {
     return axios({
@@ -27,28 +33,54 @@
     }).then(response => response.data);
   }
 
-  function generatePDF() {
+  function generatePDFWithCustomFont() {
     loadFont('fonts/kalpurush.ttf')
       .then((fontData) => {
-        const doc = new PDFDocument();
-        const stream = doc.pipe(blobStream());
-        doc.registerFont('bangla', fontData);
-        doc.font('bangla').fontSize(14);
-        doc.text(document.getElementById('content').textContent, 100, 100);
-        doc.end();
-        stream.on('finish', function() {
-          const blob = stream.toBlob('application/pdf');
-          let button = document.getElementById('downloadBtn');
-          button.href = window.URL.createObjectURL(blob);
-          button.target = '_blank';
+        _generatePdfAndHookToBtn('downloadBtn', (doc) => {
+          doc.registerFont('bangla', fontData);
+          doc.font('bangla').fontSize(14);
+          doc.text(document.getElementById('content').textContent, 100, 100);
         });
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.error('Failed to load font', error);
       });
   }
 
-  generatePDF();
+  function generatePDFWithHTMLAsImage() {
+    let node = document.getElementById('content');
+
+    domtoimage.toPng(node)
+      .then(function (dataUrl) {
+        console.log(dataUrl);
+        _generatePdfAndHookToBtn('downloadBtn2', (doc) => {
+          doc.image(dataUrl, 10, 10, {
+              fit: [300, 400],
+              align: 'center',
+            }
+          );
+        });
+      })
+      .catch(function (error) {
+        console.error('Something went wrong!', error);
+      });
+  }
+
+  function _generatePdfAndHookToBtn(btnId, modifierCb) {
+    const doc = new PDFDocument({size: 'A4', margin: 50});
+    const stream = doc.pipe(blobStream());
+    modifierCb(doc);
+    doc.end();
+    stream.on('finish', function() {
+      const blob = stream.toBlob('application/pdf');
+      let button = document.getElementById(btnId);
+      button.href = window.URL.createObjectURL(blob);
+      button.target = '_blank';
+    });
+  }
+
+  generatePDFWithCustomFont();
+  generatePDFWithHTMLAsImage();
 </script>
 </body>
 
