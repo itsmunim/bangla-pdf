@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
+    "dom-to-image": "^2.6.0",
     "pdfkit": "^0.8.3"
   }
 }
