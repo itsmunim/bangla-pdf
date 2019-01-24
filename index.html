@@ -52,7 +52,6 @@
 
     domtoimage.toPng(node)
       .then(function (dataUrl) {
-        console.log(dataUrl);
         _generatePdfAndHookToBtn('downloadBtn2', (doc) => {
           doc.image(dataUrl, 10, 10, {
               fit: [300, 400],
